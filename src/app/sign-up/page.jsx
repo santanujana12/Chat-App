@@ -1,8 +1,48 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function Register() {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await fetch('/api/sign-up', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    password,
+                    fullName,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to register user');
+            }
+
+            const data = await response.json();
+            toast.success('User registered successfully:', data);
+        } catch (error) {
+            toast.error('Failed to register user');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    
     return (
         <div className="flex flex-col items-center justify-center min-h-[85vh] relative overflow-hidden">
             {/* Ambient Background Glows */}
@@ -26,6 +66,8 @@ export default function Register() {
                             Username
                         </label>
                         <input
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             type="text"
                             className="w-full px-5 py-4 bg-slate-950/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder-slate-600 text-white font-medium shadow-inner"
                             placeholder="johndoe"
@@ -36,6 +78,8 @@ export default function Register() {
                             Full Name
                         </label>
                         <input
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
                             type="text"
                             className="w-full px-5 py-4 bg-slate-950/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder-slate-600 text-white font-medium shadow-inner"
                             placeholder="John Doe"
@@ -46,6 +90,8 @@ export default function Register() {
                             Email Address
                         </label>
                         <input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             type="email"
                             className="w-full px-5 py-4 bg-slate-950/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder-slate-600 text-white font-medium shadow-inner"
                             placeholder="name@example.com"
@@ -56,14 +102,16 @@ export default function Register() {
                             Password
                         </label>
                         <input
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             type="password"
                             className="w-full px-5 py-4 bg-slate-950/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder-slate-600 text-white font-medium shadow-inner"
-                            placeholder="••••••••"
+                            placeholder="•••••••"
                         />
                     </div>
 
-                    <button className="w-full py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-purple-500/40 active:scale-[0.98] transform flex items-center justify-center gap-2 mt-4">
-                        Get Started
+                    <button onClick={handleRegister} className="w-full py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-purple-500/40 active:scale-[0.98] transform flex items-center justify-center gap-2 mt-4">
+                        {loading ? 'Registering...' : 'Get Started'}
                     </button>
                 </form>
 
